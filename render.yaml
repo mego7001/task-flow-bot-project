@@ -1,3 +1,8 @@
+disks:
+  - name: taskflow-data
+    mountPath: /data
+    sizeGB: 1
+
 services:
   - type: web
     name: taskflow-web
@@ -8,8 +13,7 @@ services:
       - fromGroup: taskflow-secrets
     disk:
       name: taskflow-data
-      mountPath: /data
-      
+
   - type: worker
     name: taskflow-bot
     env: python
@@ -19,8 +23,3 @@ services:
       - fromGroup: taskflow-secrets
     disk:
       name: taskflow-data
-      mountPath: /data
-
-disks:
-  - name: taskflow-data
-    sizeGB: 1
