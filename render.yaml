@@ -1,29 +1,26 @@
-# تعرفة القرص الصلب لحفظ البيانات
-disks:
-  - name: taskflow-data
-    mountPath: /data
-    sizeGB: 1
-
-# تعريف الخدمات وربطها بالأوامر والقرص
 services:
   - type: web
     name: taskflow-web
     env: python
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn taskflow_app:web_app"
+    envVars:
+      - fromGroup: taskflow-secrets
     disk:
       name: taskflow-data
       mountPath: /data
-    envVars:
-      - fromGroup: taskflow-secrets # تم ربط مجموعة الأسرار بالطريقة الصحيحة
-
+      
   - type: worker
     name: taskflow-bot
     env: python
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python taskflow_app.py"
+    envVars:
+      - fromGroup: taskflow-secrets
     disk:
       name: taskflow-data
       mountPath: /data
-    envVars:
-      - fromGroup: taskflow-secrets # تم ربط مجموعة الأسرار بالطريقة الصحيحة
+
+disks:
+  - name: taskflow-data
+    sizeGB: 1
