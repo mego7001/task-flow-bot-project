@@ -1,0 +1,5 @@
+python-telegram-bot
+flask
+fpdf2
+apscheduler
+gunicorn
