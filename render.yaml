@@ -1,41 +1,29 @@
+# 1. تعريف القرص الصلب الذي سيحفظ قاعدة البيانات
+disks:
+  - name: taskflow-data
+    mountPath: /data
+    sizeGB: 1
+
+# 2. تعريف الخدمات وربطها بالأسرار والقرص
 services:
-  # خدمة الويب (لموقع Flask)
   - type: web
     name: taskflow-web
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn 'taskflow_app:web_app'"
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.10.6
-      - key: TELEGRAM_TOKEN
-        value: 7358083777:AAF642Ecm_TdPDdUwXcchc8pTwRzTqAhDbM
-      - key: EMAIL_FROM
-        value: zoro7001@gmail.com
-      - key: EMAIL_PASS
-        value: ioaqzmfxmvxuety
-      - key: SECRET_KEY
-        generateValue: true # Render سيقوم بإنشاء مفتاح سري آمن تلقائيًا
+    startCommand: "gunicorn taskflow_app:web_app"
+    envVarGroups:
+      - name: taskflow-secrets # << هنا تم ربط مجموعة الأسرار
+    disk:
+      name: taskflow-data
+      mountPath: /data
 
-  # العامل في الخلفية (لبوت التليجرام والمجدول)
   - type: worker
     name: taskflow-bot
     env: python
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python taskflow_app.py"
-    # إضافة قرص صلب دائم لحفظ قاعدة البيانات
-    disks:
-      - name: data
-        mountPath: /data
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.10.6
-      - key: TELEGRAM_TOKEN
-        value: 7358083777:AAF642Ecm_TdPDdUwXcchc8pTwRzTqAhDbM
-      - key: EMAIL_FROM
-        value: zoro7001@gmail.com
-      - key: EMAIL_PASS
-        value: ioaqzmfxmvxuety
-      # نخبر الكود أن يستخدم القرص الصلب الدائم
-      - key: RENDER_DISK_PATH
-        value: /data
+    envVarGroups:
+      - name: taskflow-secrets # << وهنا أيضًا
+    disk:
+      name: taskflow-data
+      mountPath: /data
